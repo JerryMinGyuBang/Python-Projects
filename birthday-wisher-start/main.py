@@ -11,9 +11,10 @@
 import smtplib
 import datetime as dt
 import pandas
+import random
 
-my_email = "jerrybang02@gmail.com"
-password = "hxjdkeeezopyijyt"
+my_email = "jerrypythontest@hotmail.com"
+password = "zfxndwnrqqohfnjv"
 
 now = dt.datetime.now()
 month = now.month
@@ -21,9 +22,22 @@ day = now.day
 
 df = pandas.read_csv("birthdays.csv")
 birthday_record = df.to_dict(orient="records")
+
+letters = ["letter_1.txt", "letter_2.txt", "letter_3.txt"]
+letter = random.choice(letters)
+
 for birthday in birthday_record:
     if month == birthday["month"] and day == birthday["day"]:
-        with smtplib.SMTP("smtp.gmail.com") as connection:
+        with open(f"letter_templates/{letter}") as letter_file:
+            letter_contents = letter_file.read()
+            updated_letter = letter_contents.replace("[NAME]", birthday["name"])
+            print(updated_letter)
+            with open(f"birthday_letter_for_{birthday["name"]}", mode="w") as completed_letter:
+                completed_letter.write(updated_letter)
+
+        with smtplib.SMTP("smtp-mail.outlook.com") as connection:
             connection.starttls()
             connection.login(user=my_email, password=password)
-            connection.sendmail(from_addr=my_email, to_addrs=birthday["email"], msg="hi")
+            connection.sendmail(from_addr=my_email,
+                                to_addrs="jerrybang0203@hotmail.com",
+                                msg=f"Subject:Happy Birthday!\n\n{updated_letter}")
